@@ -1,5 +1,21 @@
 # soconsole
 
+# VueFileManagaerConsole
+
+Projeto da faculdade para cadeira de Sistemas Operacionais.
+Simule o controle de arquivos com esse simulador feito em Vue.
+![Tela inicial](docs/screenshot.png)
+
+## Desenvolvedores
+
+- Nicolas Bortoluzzi
+- Iago Almeida
+
+## Tecnologias Usadas
+
+- Vue.js
+- Bootstrap 5
+
 ## Project setup
 ```
 npm install
