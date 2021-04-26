@@ -6,6 +6,9 @@ Projeto da faculdade para cadeira de Sistemas Operacionais.
 Simule o controle de arquivos com esse simulador feito em Vue.
 ![Tela inicial](docs/screenshot.png)
 
+**[Demo](https://VueFileManagerDist.miscerewebdev.repl.co)**
+
+
 ## Desenvolvedores
 
 - Nicolas Bortoluzzi
