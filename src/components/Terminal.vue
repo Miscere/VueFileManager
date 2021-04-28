@@ -50,28 +50,26 @@
                         <h5>{{memory.empties.length*4/1000}}<small class="text-muted">&nbsp;Mb / 128 Mb</small></h5>
                     </div>
                 </div>
-                <div class="row">
-                    <!--
+                <div class="row mb-5">
                     <div class="col-12 col-md-6 col-lg-4 px-3 py-2" v-for="(block, index) in memory.nodes" :key="'block_'+index">
                         <div class="row border rounded p-2">
                             <div class="col-12">
                                 <h6>
-                                    Node #{{index}}
-                                    <i class="float-end fa fa-folder"></i>
+                                    {{block.label}}
+                                    <i :class="'float-end fa fa-'+(block.type=='diretory'?'folder':'file')"></i>
                                 </h6>
                             </div>
                             <div class="col-4">
-                                <h6>{{((block/memory.blocks.length)*100).toFixed(2)}}<small class="text-muted">%</small></h6>
+                                <h6>{{((block.blocks.length/memory.blocks.length)*100).toFixed(2)}}<small class="text-muted">%</small></h6>
                             </div>
                             <div class="col-4">
-                                <h6>{{block}}<small class="text-muted">&nbsp;blocks</small></h6>
+                                <h6>{{block.blocks.length}}<small class="text-muted">&nbsp;blocks</small></h6>
                             </div>
                             <div class="col-4">
-                                <h6>{{block*4/1000}}<small class="text-muted">&nbsp;/128 Mb</small></h6>
+                                <h6>{{block.blocks.length*4/1000}}<small class="text-muted">&nbsp;/128 Mb</small></h6>
                             </div>
                         </div>
                     </div>
-                    -->
                 </div>
             </div>
         </div> 
@@ -119,17 +117,17 @@ export default {
                 // this.nodes
                 nodes: [
                     // ~
-                    {id: 0,     type:'directory',   label:'~',              parent: null,   children: [1,4],    blocks: [0]},
+                    {id: 0,     type:'diretory',   label:'~',              parent: null,   children: [1,4],    blocks: [0]},
                     // ~/home
-                    {id: 1,     type:'directory',   label:'home',           parent: 0,      children: [2,3],    blocks: [1]},
+                    {id: 1,     type:'diretory',   label:'home',           parent: 0,      children: [2,3],    blocks: [1]},
                     // ~/home/
-                    {id: 2,     type:'directory',   label:'pictures',       parent: 1,      children: [],       blocks: [2]},
-                    {id: 3,     type:'directory',   label:'documents',      parent: 1,      children: [7,8],    blocks: [3]},
+                    {id: 2,     type:'diretory',   label:'pictures',       parent: 1,      children: [],       blocks: [2]},
+                    {id: 3,     type:'diretory',   label:'documents',      parent: 1,      children: [7,8],    blocks: [3]},
                     // ~/usr
-                    {id: 4,     type:'directory',   label:'usr',            parent: 0,      children: [5,6],    blocks: [4]},
+                    {id: 4,     type:'diretory',   label:'usr',            parent: 0,      children: [5,6],    blocks: [4]},
                     // ~/usr/
-                    {id: 5,     type:'directory',   label:'libs',           parent: 4,      children: [],       blocks: [5]},
-                    {id: 6,     type:'directory',   label:'bin',            parent: 4,      children: [],       blocks: [6]},
+                    {id: 5,     type:'diretory',   label:'libs',           parent: 4,      children: [],       blocks: [5]},
+                    {id: 6,     type:'diretory',   label:'bin',            parent: 4,      children: [],       blocks: [6]},
                     // ~/home/documents/
                     {id: 7,     type:'file',        label:'README.TXT',     parent: 3,      content: 'Welcome to the terminal!',    blocks: [7,8,9,10,11,12]},
                     {id: 8,     type:'file',        label:'helloWorld.txt', parent: 3,      content: '<b>Hello world!</b>',         blocks: [13,14,15,16,17]},
@@ -172,7 +170,7 @@ export default {
                     function:       this.commandClear
                 },
                 "ls":{
-                    description:    "List all the paths and files in the directory"
+                    description:    "List all the paths and files in the diretory"
                     + "<br>Input<br>"
                     + "<i class='p-1 rounded bg-dark text-white'><b>ls</b></i><br>"
                     + "Output<br>"
@@ -186,19 +184,19 @@ export default {
                     function:       this.commandLs
                 },
                 "mkdir": {
-                    description:    "Create a new directory"
+                    description:    "Create a new diretory"
                     + "<br>Input<br>"
                     + "<i class='p-1 rounded bg-dark text-white'><b>mkdir</b> dirName</i><br>"
                     + "Output<br>"
-                    + "<i>Creates directory 'dirName/' inside current path</i><br>"
+                    + "<i>Creates diretory 'dirName/' inside current path</i><br>"
                     + "<br>Input<br>"
                     + "<i class='p-1 rounded bg-dark text-white'><b>mkdir</b> home/dirName</i><br>"
                     + "Output<br>"
-                    + "<i>Creates directory 'dirName/' inside path 'home/'/</i>",
+                    + "<i>Creates diretory 'dirName/' inside path 'home/'/</i>",
                     function:       this.commandMkdir
                 },
                 "cd":{
-                    description:    "Move to the directory"
+                    description:    "Move to the diretory"
                     + "<br>Input<br>"
                     + "<i class='p-1 rounded bg-dark text-white'><b>cd</b> home</i><br>"
                     + "Output<br>"
@@ -444,7 +442,7 @@ export default {
 
             var fileId = this.getPathIndex(path, parentId);
             if(fileId == null) { this.consolePrintMessage('danger', 'File not found', 'Error'); return; }
-            if(!this.memory.nodes[fileId].label.includes('.')) { this.consolePrintMessage('danger', 'Cant insert content into directory', 'Error'); return; }
+            if(!this.memory.nodes[fileId].label.includes('.')) { this.consolePrintMessage('danger', 'Cant insert content into diretory', 'Error'); return; }
 
             var oldMemory = this.memory.nodes[fileId].blocks.length;
             this.memory.nodes[fileId].content += content;
@@ -466,7 +464,7 @@ export default {
             var nodeId      = args.length ? this.getPathIndex(args[0], parentId) : parentId;
             var node        = this.memory.nodes[nodeId];
             // Tratamento de erros
-            if(!node)                       { this.consolePrintMessage('danger', 'Directory not found', 'Error');       return; }
+            if(!node)                       { this.consolePrintMessage('danger', 'diretory not found', 'Error');       return; }
             if(node.label.includes('.'))    { this.consolePrintMessage('danger', `Cant list '${node.label}'`, 'Error'); return; }
             if(node.children.length == 0)   { this.consolePrintList(['Empty folder']);                                  return; }
             // Printando label dos filhos
@@ -478,8 +476,8 @@ export default {
             // Definindo qual o nodo que o usuario quer entrar
             var dirName = args.length ? args[0] : null;
             // Se não inserir o nome do diretório
-            if(dirName.includes('.')) { this.consolePrintMessage('danger', 'Directory names must NOT include special symbols', 'Error'); return; }
-            if(dirName == null) { this.consolePrintMessage('danger', 'Missing name of directory', 'Error'); return; }
+            if(dirName.includes('.')) { this.consolePrintMessage('danger', 'diretory names must NOT include special symbols', 'Error'); return; }
+            if(dirName == null) { this.consolePrintMessage('danger', 'Missing name of diretory', 'Error'); return; }
             // Se for um path encontra o id do pai onde vai ser criado
             if(dirName.includes('/')){
                 var splitPath   = dirName.split('/');
@@ -487,12 +485,12 @@ export default {
                 parentId        = this.getPathIndex(splitPath.join('/'), parentId);
             }
             // Se tentar encontrar o id do pai mas não encontrar
-            if(parentId == null) { this.consolePrintMessage('danger', 'Directory not found', 'Error'); return; }
+            if(parentId == null) { this.consolePrintMessage('danger', 'diretory not found', 'Error'); return; }
 
             // Verifica se o pai não tem filho com mesmo nome
             var parentNode    = this.memory.nodes[parentId]
             var childLabels   = parentNode.children.map( (childId) => { return this.memory.nodes[childId].label });
-            if(childLabels.includes(dirName)){ this.consolePrintMessage('danger', `Directory '${splitPath.join('/')}/${dirName}' already exists`, 'Error'); return;}
+            if(childLabels.includes(dirName)){ this.consolePrintMessage('danger', `diretory '${splitPath.join('/')}/${dirName}' already exists`, 'Error'); return;}
             
             // Cria o diretório
             this.createDiretory(dirName, parentId, []);
@@ -502,7 +500,7 @@ export default {
             // Definindo qual o nodo que o usuario quer entrar
             var dirName = args.length ? args[0] : null;
             // Se não inserir o nome do diretório
-            if(dirName == null) { this.consolePrintMessage('danger', 'Missing name of directory', 'Error'); return; }
+            if(dirName == null) { this.consolePrintMessage('danger', 'Missing name of diretory', 'Error'); return; }
             var target = this.getPathIndex(dirName, parentId)
             if(target == null) { this.consolePrintMessage('danger', `Path '${dirName}' not found`, 'Error'); return; }
             this.currentNodeIndex = target;
@@ -523,7 +521,7 @@ export default {
                 parentId        = this.getPathIndex(splitPath.join('/'), parentId);
             }
             // Se tentar encontrar o id do pai mas não encontrar
-            if(parentId == null) { this.consolePrintMessage('danger', 'Directory not found', 'Error'); return; }
+            if(parentId == null) { this.consolePrintMessage('danger', 'diretory not found', 'Error'); return; }
 
             // Verifica se o pai não tem filho com mesmo nome
             var parentNode    = this.memory.nodes[parentId]
@@ -545,7 +543,7 @@ export default {
             var path    = args.length ?  args[0]    : null;
             var fileId  = this.getPathIndex(path, parentId);
             if(fileId == null) { this.consolePrintMessage('danger', 'File not found', 'Error'); return;}
-            if(this.memory.nodes[fileId].type=='directory') { this.consolePrintMessage('danger', "Use 'rmdir' to remove directory", 'Error'); return;}
+            if(this.memory.nodes[fileId].type=='diretory') { this.consolePrintMessage('danger', "Use 'rmdir' to remove diretory", 'Error'); return;}
             this.deleteNode(fileId);
         },
 
@@ -565,7 +563,7 @@ export default {
             if(nodeId == null) { this.consolePrintMessage('danger', 'Path not found', 'Error'); return;}
             if(!newName) { this.consolePrintMessage('danger', 'Missing new name', 'Error'); return;}
             if(this.memory.nodes[nodeId].type=='file' && !newName.includes('.')) { this.consolePrintMessage('danger', 'Missing file format', 'Error'); return;}
-            if(!this.memory.nodes[nodeId].type=='file' && newName.includes('.')) { this.consolePrintMessage('danger', 'Directory names must NOT include special symbols', 'Error'); return; }
+            if(!this.memory.nodes[nodeId].type=='file' && newName.includes('.')) { this.consolePrintMessage('danger', 'diretory names must NOT include special symbols', 'Error'); return; }
             this.memory.nodes[nodeId].label = newName;
         },
 
