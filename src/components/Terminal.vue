@@ -14,7 +14,7 @@
                         </div>
                     </div>
                     <div class="terminal-entry position-absolute bottom-0 left-0 pb-1 w-100">
-                        <b class="text-primary">{{currentPath.text}}</b>$
+                        <b class="text-primary">{{currentPathText}}</b>$
                         <input type="text" v-model="inputConsole" ref="DOMinputTerminal" class="terminal-input bg-dark text-white border-0 w-75">
                     </div>
                 </div>
@@ -51,7 +51,8 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-12 col-md-6 col-lg-4 px-3 py-2" v-for="(block, index) in blocksToRender" :key="'block_'+index">
+                    <!--
+                    <div class="col-12 col-md-6 col-lg-4 px-3 py-2" v-for="(block, index) in memory.nodes" :key="'block_'+index">
                         <div class="row border rounded p-2">
                             <div class="col-12">
                                 <h6>
@@ -70,30 +71,8 @@
                             </div>
                         </div>
                     </div>
+                    -->
                 </div>
-                <!--
-                <div class="row mb-5 p-3 rounded bg-dark ">
-                    <div class="col-12 row gx-1 gy-1 container overflow-auto" style="max-height:300px;">
-                        <div 
-                        class="col-1" 
-                        v-for="(block, index) in memory.blocks" 
-                        :key="'memory_block_'+index" 
-                        :ref="'memory_block_'+index">
-                            <div class="p-1 rounded" :style="'background-color:'+(block != null ? generateHexColor(block) : '#eee')"></div>
-                        </div>
-                    </div>
-                    <div class="progress bg-white col-12 px-0 m-1">
-                        <div 
-                        v-for="(block, index) in memory.blocks" 
-                        :key="'memory_block_'+index" 
-                        :ref="'memory_block_'+index"
-                        class="progress-bar border border-white rounded" 
-                        role="progressbar" 
-                        data-bs-toggle="tooltip" data-bs-placement="top" :title="'Node #'+block"
-                        :style="'width:' + 100/memory.blocks.length + '%;' + 'background-color:'+(block != null ? generateHexColor(block) : '#eee')">
-                        </div>
-                    </div>
-                </div>-->
             </div>
         </div> 
         <ModalHelp :commands="validCommands"></ModalHelp>
@@ -113,67 +92,58 @@ export default {
     },
 
     data() {
+
+
+//      Operações sobre arquivos:
+
+//     - Criar arquivo (touch)                                      OK
+//     - Remover arquivo (rm arquivo)                               OK
+//     - Escrever no arquivo (echo "conteudo legal" >> arquivo)     OK
+//     - Ler arquivo (cat arquivo)                                  OK
+//     - Copiar arquivo (cp arquivo1 arquivo2)                      OK 
+//     - Renomear arquivo (mv arquivo1 arquivo2)                    OK
+
+//      Operações sobre diretórios:
+
+//     - Criar diretório (mkdir diretorio)                                              OK
+//     - Remover diretório (rmdir diretorio) - só funciona se diretório estiver vazio   OK
+//     - Trocar de diretório (cd diretorio)                                             OK
+//         * Não esquecer dos arquivos especiais . e ..                                 OK
+//     - Renomear diretorio (mv diretorio1 diretorio2)                                  OK
+        
+        
         return {
-
-            /*
-            absolutePath: {
-                "home": {
-                    "pictures": {
-                        "picture1.png": "img",
-                        "picture2.png": "img",
-                        "picture3.png": "img",
-                        "picture4.png": "img",
-                        "picture5.png": "img",
-                    },
-                    "documents": {
-                        "readme.txt": "Texto que está dentro desse arquivo",
-                        "important.txt": "text",
-                    }
-                },
-                "usr": {
-                    "lib": {
-                        "lib-javascript.so": "file"
-                    },
-                }
-            },*/
-
-            absolutePath: {
-                memoryId:       -1,
-                memoryBlocks:   [],
-                nodes:{
-                    "home":{
-                        memoryId:       0,
-                        memoryBlocks: [0],
-                        nodes:          {
-                            "README.txt": {
-                                memoryId:       2,
-                                memoryBlocks:   [2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33],
-                                nodes:          "Welcome to the console simulator!"
-                            }
-                        }
-                    },
-                    "usr": {
-                        memoryId:       1,
-                        memoryBlocks: [0],
-                        nodes:          {}
-                    }
-                }
-            },
-
+            // 1kb por caracter
+            // 4kb por folder
             memory: {
-                blocks:     [0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
-                empties:    [],
-                currId:     2
+                // this.nodes
+                nodes: [
+                    // ~
+                    {id: 0,     type:'directory',   label:'~',              parent: null,   children: [1,4],    blocks: [0]},
+                    // ~/home
+                    {id: 1,     type:'directory',   label:'home',           parent: 0,      children: [2,3],    blocks: [1]},
+                    // ~/home/
+                    {id: 2,     type:'directory',   label:'pictures',       parent: 1,      children: [],       blocks: [2]},
+                    {id: 3,     type:'directory',   label:'documents',      parent: 1,      children: [7,8],    blocks: [3]},
+                    // ~/usr
+                    {id: 4,     type:'directory',   label:'usr',            parent: 0,      children: [5,6],    blocks: [4]},
+                    // ~/usr/
+                    {id: 5,     type:'directory',   label:'libs',           parent: 4,      children: [],       blocks: [5]},
+                    {id: 6,     type:'directory',   label:'bin',            parent: 4,      children: [],       blocks: [6]},
+                    // ~/home/documents/
+                    {id: 7,     type:'file',        label:'README.TXT',     parent: 3,      content: 'Welcome to the terminal!',    blocks: [7,8,9,10,11,12]},
+                    {id: 8,     type:'file',        label:'helloWorld.txt', parent: 3,      content: '<b>Hello world!</b>',         blocks: [13,14,15,16,17]},
+                ],
+                // Memory blocks [node.id, node.id, ...]
+                blocks:         [0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8],
+                // Empty ids
+                empties:  []
             },
+            
+            currentNodeIndex: 0,
+            currentPathText:  "",
 
             blockColors: ["54478c","2c699a","048ba8","0db39e","16db93","83e377","b9e769","efea5a","f1c453","f29e4c"],
-            blocksToRender: [],
-
-            currentPath: {
-                text: "",
-                pathObj: {},
-                pathHistory: []
-            },
 
             history: [
                 /*{ path: "~/", type: "unique", value:"ls teste" },
@@ -181,7 +151,6 @@ export default {
             ],
 
             inputConsole: "",
-
             inputHistory: [],
             inputHistoryPosition: 0,
 
@@ -214,7 +183,7 @@ export default {
                     + "Output<br>"
                     + "<i class='p-1 rounded bg-dark text-white'>README.txt</i><br>"
                     + "<i>All files and folders inside home/</i>",
-                    function:       this.commandList
+                    function:       this.commandLs
                 },
                 "mkdir": {
                     description:    "Create a new directory"
@@ -226,7 +195,7 @@ export default {
                     + "<i class='p-1 rounded bg-dark text-white'><b>mkdir</b> home/dirName</i><br>"
                     + "Output<br>"
                     + "<i>Creates directory 'dirName/' inside path 'home/'/</i>",
-                    function:       this.commandMakeDiretory
+                    function:       this.commandMkdir
                 },
                 "cd":{
                     description:    "Move to the directory"
@@ -234,7 +203,7 @@ export default {
                     + "<i class='p-1 rounded bg-dark text-white'><b>cd</b> home</i><br>"
                     + "Output<br>"
                     + "<i>Sets current path as 'home/'/</i>",
-                    function:       this.commandMoveTo
+                    function:       this.commandCd
                 },
                 "touch":{
                     description:    "Create new file"
@@ -258,11 +227,31 @@ export default {
                     + "<i class='p-1 rounded bg-dark text-white'><b>rm</b> home/README.txt</i><br>"
                     + "Output<br>"
                     + "<i>Removes file 'home/README.txt', cannot be undone</i>",
-                    function:       this.commandRemoveFile
+                    function:       this.commandRm
                 },
                 "rmdir":{
-                    description:    "<i class='fa fa-cog'>&nbsp;</i>Under development",
-                    function:       this.commandRemoveFolder
+                    description:    "Remove a diretory"
+                    + "<br>Input<br>"
+                    + "<i class='p-1 rounded bg-dark text-white'><b>rmdir</b> home/pictures</i><br>"
+                    + "Output<br>"
+                    + "<i>Removes diretory 'home/picutres/' if its empty</i>",
+                    function:       this.commandRmdir
+                },
+                "mv":{
+                    description:    "Rename a file or folder"
+                    + "<br>Input<br>"
+                    + "<i class='p-1 rounded bg-dark text-white'><b>mv</b> home/pictures home/images</i><br>"
+                    + "Output<br>"
+                    + "<i>Renames diretory 'home/picutres/' to 'home/images'</i>",
+                    function:       this.commandMv
+                },
+                "cp":{
+                    description:    "Clone a file"
+                    + "<br>Input<br>"
+                    + "<i class='p-1 rounded bg-dark text-white'><b>cp</b> home/documents/README.txt home/pictures/CLONE.txt</i><br>"
+                    + "Output<br>"
+                    + "<i>Clones file 'home/documents/README.txt' into 'home/pictures/CLONE.txt'</i>",
+                    function:       this.commandCp
                 },
                 "save":{
                     description:    "Save current state"
@@ -285,8 +274,6 @@ export default {
     },
 
     mounted() {
-        this.currentPath.pathObj    = this.absolutePath;
-        this.currentPath.text       = "~/";
         this.$refs.DOMinputTerminal.addEventListener("keydown", e => {
             switch(e.key){
                 case 'Enter':
@@ -304,7 +291,7 @@ export default {
             }
             
         });
-        this.memory.currId = 3;
+        this.updatePathText();
         this.$refs.DOMdivContainer.addEventListener('click', () => { this.$refs.DOMinputTerminal.focus() });
     },
 
@@ -313,262 +300,285 @@ export default {
             deep: true,
             handler: function() {
                 var elem = this.$refs.DOMdivHistory
-                setTimeout(function(){elem.scrollTop = elem.scrollHeight;},50);
+                setTimeout(function(){elem.scrollTop = elem.scrollHeight;}, 50);
             }
         },
         memory: {
             deep: true,
-            handler: function(newVal) {
-                this.blocksToRender = [];
-                for(var block of newVal.blocks){
-                    if(this.blocksToRender[block]){ this.blocksToRender[block] += 1 }
-                    else { this.blocksToRender[block] = 1;} 
-                }
+            handler: function() {
+                console.log(this.memory.blocks)
             }
         }
     },
 
     methods: {
+        // Transforma entrada no usuário em função
+        executeCommand(){
+            var treatedInput        = this.inputConsole.trim()                  // Removendo espaços do começo e do fim da entrada
+            var splitInput          = treatedInput.split(' ');                  // Separando por ' '
+            var commandName         = splitInput.shift();                       // 'comandoNome' é a primeira parte
+            var commandArgs         = splitInput;                               // 'comandoArgumentos' é o resto da lista
+            var commandObj          = this.validCommands[commandName];          // 'comandoObjeto' = 'comandosVálidos[comandoNome]' virá undefined se não existir
+            this.consolePrintMessage('normal', this.inputConsole);              // Emite o comando inserido
+            this.inputHistory.push(this.inputConsole);
+            this.inputHistoryPosition = this.inputHistory.length;
+            // Se não existir emite mensagem e retorna
+            if(!commandObj) { this.consolePrintMessage('warning', `Command '${commandName}' not found!`, 'Error'); return; }
+            commandObj.function(commandArgs);
+        },
+
+        updatePathText(){
+            var path = [];
+            var temp = this.memory.nodes[this.currentNodeIndex];
+            while(temp.parent != null){
+                path.push(temp.label);
+                temp = this.memory.nodes[temp.parent]
+            }
+            path.reverse()
+            this.currentPathText = '~/'+path.join('/')+(path.length?'/':'');
+        },
 
         generateHexColor(id){
             var colorId = id.toString()[0];
             return '#'+this.blockColors[colorId]
         },
-
-        createDiretory(directoryName, path = this.currentPath){
-            //Se já existir o diretório retorna
-            if(Object.keys(path).includes(directoryName)) { this.emitMessage('danger', `Directory with name '${directoryName}' already exists`); return; }
-
-            // Adicionando na memória
-            var memoryBlock = this.memory.empties.length >= 1 ? this.memory.empties.shift() : ( this.memory.blocks.length < 32000 ? this.memory.blocks.length : null );
-            if(!memoryBlock) { this.emitMessage('danger', 'Could not create diretory, no memory avaliable'); return; }
-            this.memory.blocks[memoryBlock] = this.memory.currId;
-
-
-            // Adicionando ao objeto
-            path.nodes[directoryName] = {
-                memoryId:       this.memory.currId,
-                memoryBlocks:   [memoryBlock],
-                nodes:          {}
-            }
-            
-            // Incrementa o id atual
-            this.memory.currId += 1;
+        
+        consolePrintMessage(type, content, title=null){
+            var text = (title ? (type != 'normal' ? `<b class="text-${type}">${title} - </b>` : `<b>${title} - </b>`) : '') + `${content}`
+            this.history.push({ path: this.currentPathText, type:'unique', value:text });
         },
 
-        createFile(fileName, fileContent="Write something with 'echo'", path=this.currentPath){
-            var fileSize = fileContent.length
-            var blocks = []
-            var usedMemory = 0
-            // Definindo blocos para alocar
-            while(fileSize > 0){
-                if(this.memory.empties.length > 0) { blocks.push(this.memory.empties.shift()); }
-                else{ blocks.push(this.memory.blocks.length + usedMemory); usedMemory += 1; }
-                fileSize -= 1;
-            }
-            if(usedMemory + this.memory.blocks.length > 32000) { this.emitMessage('danger', 'Could not create file, no memory avaliable'); return;}
-            // Alocando memória
-            for(var block of blocks){
-                this.memory.blocks[block] = this.memory.currId;
-            }
-            // Adicionando ao objeto
-            path.nodes[fileName] = {
-                memoryId:       this.memory.currId,
-                memoryBlocks:   blocks,
-                nodes:          fileContent
-            };
-            // Incrementa o id atual
-            this.memory.currId += 1;
+        consolePrintList(content){
+            this.history.push({ path:this.currentPathText, type:'list', value:content });
         },
 
-        // Delete file
-        removeFile(fileName, path=this.currentPath){
-            var fileObj = path.nodes[fileName];
-            console.log(this.memory.blocks);
-            for(var block of fileObj.memoryBlocks){
+        allocateBlocks(nodeId, blockQuantity){
+            var blocks = [];
+            while(blockQuantity--){
+                var id = (this.memory.empties.length > 0) ? this.memory.empties.shift() : this.memory.blocks.length;
+                this.memory.blocks[id] = nodeId;
+                blocks.push(id);
+            }
+            return [...blocks];
+        },
+
+        createDiretory(label, parent, children){
+            var id = this.memory.nodes.length;
+            this.memory.nodes.push({id: id,  type:'folder', label:label, parent: parent, children: children, blocks: this.allocateBlocks(id, 1)});
+            if(this.memory.nodes[parent]) { this.memory.nodes[parent].children.push(id); }
+            return id;
+        },
+
+        createFile(label, parent, content){
+            var id = this.memory.nodes.length;
+            this.memory.nodes.push({id: id, type:'file', label:label, parent: parent, content: content, blocks: this.allocateBlocks(id, Math.ceil(content.length/4))});
+            if(this.memory.nodes[parent]) { this.memory.nodes[parent].children.push(id); }
+            return id;
+        },
+
+        deleteNode(id){
+            var fileToDelete = this.memory.nodes[id];
+            console.log(fileToDelete)
+            for(var block of fileToDelete.blocks){
                 this.memory.blocks[block] = null;
                 this.memory.empties.push(block);
             }
-            console.log(this.memory.blocks);
-            delete path.nodes[fileName];
+            var parent = this.memory.nodes[fileToDelete.parent];
+            var parentChildrenIndex = parent.children.indexOf(id);
+            parent.children.splice(parentChildrenIndex, 1);
+            this.memory.nodes[id] = null;
         },
 
-        // Helpers
-        emitMessage(type, message){
-            message = type != 'normal' ? `<span class="text-${type}">` + message + '</span>' : message;
-            this.history.push({
-                path: this.currentPath.text,
-                type: 'unique',
-                value: message
-            });
-        },
-
-        // Retorna o NovoCaminho se for válido, senão retorna o atual
-        isPathValid(destinyPath, startingPoint=this.currentPath){
-            var deepness    = 0
-            var steps       = destinyPath.split('/')
-            var actualPath  = Object.assign({}, startingPoint)
-            for(var step of steps){
-                if(Object.keys(actualPath.pathObj.nodes).includes(step)){
-                    actualPath.pathHistory.push(Object.assign({}, actualPath.pathObj));
-                    actualPath.pathObj  = actualPath.pathObj.nodes[step]
-                    actualPath.text     += step + '/'
-                    deepness            += 1
-                }
-            }
-            if(deepness != steps.length){ this.emitMessage('warning', `Path not found!`) }
-            return (deepness == steps.length) ? actualPath : this.currentPath 
-        },
-
-        // Transforma entrada no usuário em função
-        executeCommand(){
-            var treatedInput        = this.inputConsole.trim()          // Removendo espaços do começo e do fim da entrada
-            var splitInput          = treatedInput.split(' ');          // Separando por ' '
-            var commandName         = splitInput[0];                    // 'comandoNome' é a primeira parte
-            splitInput.shift();                                         // remove a primeira parte
-            var commandArgs         = splitInput;                       // 'comandoArgumentos' é o resto da lista
-            var commandObj          = this.validCommands[commandName];  // 'comandoObjeto' = 'comandosVálidos[comandoNome]' virá undefined se não existir
-            this.emitMessage('normal', this.inputConsole);              // Emite o comando inserido
-            this.inputHistory.push(this.inputConsole);
-            this.inputHistoryPosition = this.inputHistory.length;
-            // Se não existir emite mensagem e retorna
-            if(!commandObj) { this.emitMessage('warning', `Command '${commandName}' not found!`); return; }
-            commandObj.function(commandArgs);
-        },
 
         // Console commands
         commandSave(){
-            var currentPathJSON = JSON.stringify(this.currentPath)
             var memoryJSON = JSON.stringify(this.memory)
-
-            console.log(memoryJSON)
             localStorage.setItem('memory', memoryJSON);
-            localStorage.setItem('currentPath', currentPathJSON);
         },
 
         commandLoad(){
             var memoryJSON = localStorage.getItem('memory')
-            var currentPathJSON = localStorage.getItem('currentPath')
             this.memory = (memoryJSON) ? JSON.parse(memoryJSON) : this.memory;
-            this.currentPath = (currentPathJSON) ? JSON.parse(currentPathJSON) : this.currentPath;
-        },
-        
-        commandEcho(args){
-            var text = Array.isArray(args) ? args[0] : args
-            this.emitMessage('normal', '"'+text+'"')
         },
 
         commandClear(){
             this.history = [];
         },
+        
+        getPathIndex(path, parentId = this.currentNodeIndex){
+            var deepness  = 0;
+            var steps     = path.split('/');
+            var tempId    = parentId;
+            if(steps[0] == '~'){
+                steps.shift();
+                tempId = 0;
+            }
+            if(steps[0] == '.'){ steps.shif(); }
+            for(var nodeLabel of steps){
+                var node = this.memory.nodes[tempId]
+                if(nodeLabel == '..' && 'parent' in node){
+                    deepness += 1;
+                    tempId = node.parent;
+                }else{
+                    for(var child of node.children){
+                        var childNode = this.memory.nodes[child]
+                        if(childNode.label == nodeLabel){
+                            deepness += 1;
+                            tempId = childNode.id; 
+                            break;
+                        }
+                    }
+                }
+            }
+            return (deepness == steps.length) ? tempId : null;
+        },
+        
+        commandEcho(args, parentId = this.currentNodeIndex){
+            if(args.length < 3) { this.consolePrintMessage('danger', 'Missing parameters', 'Error'); return;}
+            
+            var path = args.pop() //a.txt
+            args.pop()
+            var content = args.join(" ")
+            content.replace('"','');
+           
 
-        commandList(args){
-            var diretoryToList = args[0] ? this.isPathValid(args[0]).pathObj : this.currentPath.pathObj ;
-            this.history.push({
-                path: this.currentPath.text,
-                type: 'list',
-                value: Object.keys(diretoryToList.nodes)
-            });
+            var fileId = this.getPathIndex(path, parentId);
+            if(fileId == null) { this.consolePrintMessage('danger', 'File not found', 'Error'); return; }
+            if(!this.memory.nodes[fileId].label.includes('.')) { this.consolePrintMessage('danger', 'Cant insert content into directory', 'Error'); return; }
+
+            var oldMemory = this.memory.nodes[fileId].blocks.length;
+            this.memory.nodes[fileId].content += content;
+            var newMemory = Math.ceil(this.memory.nodes[fileId].content.length/4);
+            
+            var blocskDiff = oldMemory- newMemory;
+            if(blocskDiff > 0){
+                this.memory.nodes[fileId].blocks.push(this.allocateBlocks(fileId, blocskDiff))
+            }else{
+                blocskDiff *= -1
+                while(blocskDiff--){
+                    this.memory.blocks[this.memory.nodes[fileId].blocks.pop()] = null;
+                }
+            }
         },
 
-        commandMakeDiretory(args, startingPoint = this.currentPath.pathObj){
-            // Trata o nome do diretório
-            var diretoryName = Array.isArray(args) ? args[0] : args;
-            // Se o nome do diretório conter '.' é inválido [return]
-            if(diretoryName.includes('.')){ this.emitMessage('warning', `'${diretoryName}' is not a valid name`); return; }
-            // Se o nome do diretório não incluir '/' cria o diretório na localização atual [return]
-            if(!diretoryName.includes('/')) { this.createDiretory(diretoryName, startingPoint); return;}
-            // Separa o nome do diretório em '/'
-            var directorySplit = diretoryName.split('/')
-            // Se a primeira pasta do nome dividido não existir, cria
-            if(!startingPoint[directorySplit[0]]){ this.createDiretory([directorySplit[0]], startingPoint); }
-            // Recupera o diretório criado
-            var createdDir = startingPoint[directorySplit[0]];
-            // Remove-o da lista
-            directorySplit.shift()
-            // Cria os diretórios restantes
-            this.commandMakeDiretory(directorySplit.join('/'), createdDir)
+        commandLs(args, parentId = this.currentNodeIndex){
+            // Definindo qual o nodo a ter os filhos listados
+            var nodeId      = args.length ? this.getPathIndex(args[0], parentId) : parentId;
+            var node        = this.memory.nodes[nodeId];
+            // Tratamento de erros
+            if(!node)                       { this.consolePrintMessage('danger', 'Directory not found', 'Error');       return; }
+            if(node.label.includes('.'))    { this.consolePrintMessage('danger', `Cant list '${node.label}'`, 'Error'); return; }
+            if(node.children.length == 0)   { this.consolePrintList(['Empty folder']);                                  return; }
+            // Printando label dos filhos
+            this.consolePrintList(node.children.map( (n) => { return this.memory.nodes[n].label; }));
         },
 
-        commandMoveTo(args){
-            // Se chamar o comando com 0 ou mais de 1 argumento
-            if(args.length > 1 || args.length == 0){ this.emitMessage('warning', `Wrong parameters structure, use 'cd folder/folder/'`); return; }
-            // Trata o nome do diretório
-            var path = Array.isArray(args)?args[0]:args;
-            // Se o nome não for '..' defina o caminho atual como this.isPathValid(path) [return]
-            if(path  != '..') { this.currentPath = this.isPathValid(path); return; }
-            // Se o nome for '..' e já estiver no topo emite mensagem de erro [return]
-            if(path == '..' && this.currentPath.pathHistory.length <= 0) { this.emitMessage('warning', 'Cannot get back one level'); return; }
-            // Define o último pathHistory como o path atual
-            this.currentPath.pathObj = this.currentPath.pathHistory[this.currentPath.pathHistory.length-1]
-            // Remove o último pathHistory da lista
-            this.currentPath.pathHistory.splice(-1, 1)
-            // Corrige o texto do currentPath.text
-            var splitPathText = this.currentPath.text.split('/')
-            if(splitPathText.length > 1){ splitPathText.pop(); splitPathText.pop(); }
-            this.currentPath.text = splitPathText.join('/') + '/'
+    
+        commandMkdir(args, parentId = this.currentNodeIndex){
+            // Definindo qual o nodo que o usuario quer entrar
+            var dirName = args.length ? args[0] : null;
+            // Se não inserir o nome do diretório
+            if(dirName.includes('.')) { this.consolePrintMessage('danger', 'Directory names must NOT include special symbols', 'Error'); return; }
+            if(dirName == null) { this.consolePrintMessage('danger', 'Missing name of directory', 'Error'); return; }
+            // Se for um path encontra o id do pai onde vai ser criado
+            if(dirName.includes('/')){
+                var splitPath   = dirName.split('/');
+                dirName         = splitPath.pop();
+                parentId        = this.getPathIndex(splitPath.join('/'), parentId);
+            }
+            // Se tentar encontrar o id do pai mas não encontrar
+            if(parentId == null) { this.consolePrintMessage('danger', 'Directory not found', 'Error'); return; }
+
+            // Verifica se o pai não tem filho com mesmo nome
+            var parentNode    = this.memory.nodes[parentId]
+            var childLabels   = parentNode.children.map( (childId) => { return this.memory.nodes[childId].label });
+            if(childLabels.includes(dirName)){ this.consolePrintMessage('danger', `Directory '${splitPath.join('/')}/${dirName}' already exists`, 'Error'); return;}
+            
+            // Cria o diretório
+            this.createDiretory(dirName, parentId, []);
         },
 
-        commandTouch(args, startingPoint=this.currentPath){
-            // Trata os argumentos
-            var userInput       = Array.isArray(args)? args.shift() : args;
-            var fileContent     = Array.isArray(args)? args.join(' ') : "Insert text here..."
-            // Quebra o texto nas '/'
-            var fileSplitText   = userInput.split('/');
-            // Remove o ultimo item do texto quebrado
-            var fileNameText    = fileSplitText.pop();
-
-
-
-            // Redefine o pathObj do arquivo se não for o atual
-            var filePathObj     = fileSplitText.length > 0 ? (this.isPathValid(fileSplitText.join('/'), startingPoint)) : (startingPoint);
-
-
-            // Se não encontrar o pathObj, emite mensagem [return]
-            if(!filePathObj){ this.emitMessage('warning', `Directory '${fileSplitText.join('/')}' not found`); return; }
-            // Se o arquivo não tiver o formato especificado, emite mensagem [return]
-            if(!fileNameText.includes('.')) { this.emitMessage('warning', `Missing file format`); return; }
-            // Cria o arquivo / redefine o texto do arquivo
-            this.createFile(fileNameText, fileContent, filePathObj.pathObj);
+        commandCd(args, parentId = this.currentNodeIndex){
+            // Definindo qual o nodo que o usuario quer entrar
+            var dirName = args.length ? args[0] : null;
+            // Se não inserir o nome do diretório
+            if(dirName == null) { this.consolePrintMessage('danger', 'Missing name of directory', 'Error'); return; }
+            var target = this.getPathIndex(dirName, parentId)
+            if(target == null) { this.consolePrintMessage('danger', `Path '${dirName}' not found`, 'Error'); return; }
+            this.currentNodeIndex = target;
+            this.updatePathText();
         },
 
-        commandCat(args, startingPoint=this.currentPath){
-            // Trata os argumentos
-            var userInput       = Array.isArray(args)?args[0]:args;
-            if(!userInput) { this.emitMessage('warning', 'Missing file name'); return; }
-            // Quebra o texto nas '/'
-            var fileSplitText   = userInput.split('/');
-            // Remove o primeiro item do texto quebrado
-            var fileName        = fileSplitText.pop();
-            if(!fileName.includes('.')) { this.emitMessage('warning', `Missing file format`); return; }
-            // Redefine o pathObj do arquivo se não for o atual
-            var filePathObj     = fileSplitText.length > 0 ? (this.isPathValid(fileSplitText.join('/'), startingPoint)) : (startingPoint);
-            // Se o diretório não existir, emite mensagem [return]
-            if(!filePathObj){ this.emitMessage('warning', `Directory '${fileSplitText.join('/')}' not found`); return; }
-            // Se o arquivo não existir, emite mensagem [return]
-            if(!filePathObj.pathObj.nodes[fileName]){ this.emitMessage('warning', `File '${userInput}' not found`); return; }
-            // Emite comando Echo com o conteúdo do arquivo
-            this.commandEcho(filePathObj.pathObj.nodes[fileName].nodes);
+        commandTouch(args, parentId=this.currentNodeIndex){
+            // Definindo qual o nodo que o usuario quer entrar
+            var fileName    = args.length ?  args.shift()    : null;
+            var fileContent = args.length ?  args.join(' ')  : ''
+            // Se não inserir o nome do diretório
+            if(fileName == null) { this.consolePrintMessage('danger', 'Missing name of file', 'Error'); return; }
+            if(!fileName.includes('.')) { this.consolePrintMessage('danger', 'Missing file format', 'Error'); return; }
+            // Se for um path encontra o id do pai onde vai ser criado
+            if(fileName.includes('/')){
+                var splitPath   = fileName.split('/');
+                fileName        = splitPath.pop();
+                parentId        = this.getPathIndex(splitPath.join('/'), parentId);
+            }
+            // Se tentar encontrar o id do pai mas não encontrar
+            if(parentId == null) { this.consolePrintMessage('danger', 'Directory not found', 'Error'); return; }
+
+            // Verifica se o pai não tem filho com mesmo nome
+            var parentNode    = this.memory.nodes[parentId]
+            var childLabels   = parentNode.children.map( (childId) => { return this.memory.nodes[childId].label });
+            if(childLabels.includes(fileName)){ this.consolePrintMessage('danger', `File '${fileName}' already exists`, 'Error'); return;}
+            
+            // Cria o arquivo
+            this.createFile(fileName, parentId, fileContent);
         },
 
-        commandRemoveFile(args, startingPoint=this.currentPath){
-            // Trata os argumentos
-            var userInput       = Array.isArray(args)?args[0]:args;
-            if(!userInput) { this.emitMessage('warning', 'Missing filename'); return; }
-            // Quebra o texto nas '/'
-            var fileSplitText   = userInput.split('/');
-            // Remove o primeiro item do texto quebrado
-            var fileName        = fileSplitText.pop();
-            if(!fileName.includes('.')) { this.emitMessage('warning', `Missing file format`); return; }
-            // Redefine o pathObj do arquivo se não for o atual
-            var filePathObj     = fileSplitText.length > 0 ? (this.isPathValid(fileSplitText.join('/'), startingPoint)) : (startingPoint);
-            // Se o diretório não existir, emite mensagem [return]
-            if(!filePathObj){ this.emitMessage('warning', `Directory '${fileSplitText.join('/')}' not found`); return; }
-            // Se o arquivo não existir, emite mensagem [return]
-            if(!filePathObj.pathObj.nodes[fileName]){ this.emitMessage('warning', `File '${userInput}' not found`); return; }
-            // Emite comando Echo com o conteúdo do arquivo
-            this.removeFile(fileName, filePathObj.pathObj);
-            this.commandEcho(`File '${userInput}' removed`);
+        commandCat(args, parentId=this.currentPath){
+            var path    = args.length ?  args[0]    : null;
+            var fileId  = this.getPathIndex(path, parentId);
+            if(fileId == null) { this.consolePrintMessage('danger', 'File not found', 'Error'); return;}
+            this.consolePrintMessage('normal', this.memory.nodes[fileId].content, `'${this.memory.nodes[fileId].label}'`)
+        },
+
+        commandRm(args, parentId=this.currentPath){
+            var path    = args.length ?  args[0]    : null;
+            var fileId  = this.getPathIndex(path, parentId);
+            if(fileId == null) { this.consolePrintMessage('danger', 'File not found', 'Error'); return;}
+            if(this.memory.nodes[fileId].type=='directory') { this.consolePrintMessage('danger', "Use 'rmdir' to remove directory", 'Error'); return;}
+            this.deleteNode(fileId);
+        },
+
+        commandRmdir(args, parentId=this.currentPath){
+            var path    = args.length ?  args[0]    : null;
+            var diretoryId  = this.getPathIndex(path, parentId);
+            if(diretoryId == null) { this.consolePrintMessage('danger', 'Diretory not found', 'Error'); return;}
+            if(this.memory.nodes[diretoryId].type=='file') { this.consolePrintMessage('danger', "Use 'rm' to remove a file", 'Error'); return;}
+            if(this.memory.nodes[diretoryId].children.length) { this.consolePrintMessage('danger', "Diretory is not empty", 'Error'); return;}
+            this.deleteNode(diretoryId);
+        },
+
+        commandMv(args, parentId=this.currentPath){
+            var path    = args.length ?     args[0]     : null;
+            var newName = args.length ?     args[1]     : null;
+            var nodeId  = this.getPathIndex(path, parentId);
+            if(nodeId == null) { this.consolePrintMessage('danger', 'Path not found', 'Error'); return;}
+            if(!newName) { this.consolePrintMessage('danger', 'Missing new name', 'Error'); return;}
+            if(this.memory.nodes[nodeId].type=='file' && !newName.includes('.')) { this.consolePrintMessage('danger', 'Missing file format', 'Error'); return;}
+            if(!this.memory.nodes[nodeId].type=='file' && newName.includes('.')) { this.consolePrintMessage('danger', 'Directory names must NOT include special symbols', 'Error'); return; }
+            this.memory.nodes[nodeId].label = newName;
+        },
+
+        commandCp(args, parentId=this.currentPath){
+            var pathOriginal    = args.length ?     args[0]     : null;
+            var pathClone       = args.length ?     args[1]     : null;
+            if(pathClone == null) { this.consolePrintMessage('danger', 'Missing clone path', 'Error'); return;}
+
+            var originalId = this.getPathIndex(pathOriginal, parentId);
+            if(originalId == null) { this.consolePrintMessage('danger', 'Original file not found', 'Error'); return;}
+
+            var originalNode = this.memory.nodes[originalId];
+            this.commandTouch([pathClone, originalNode.content]);
         }
     }
 }

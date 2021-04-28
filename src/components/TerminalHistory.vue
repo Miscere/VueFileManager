@@ -5,7 +5,7 @@
             <span v-html="history.value"></span>
         </div>
         <div v-else-if="history.type == 'list'" class="row">
-            <span v-for="(item, index) in history.value" :key="'history_'+mainIndex+'_value_'+index" v-html="item" class="col-4" :class="item.includes('.')?'text-muted':'text-info'"></span>
+            <span v-for="(item, index) in history.value" :key="'history_'+mainIndex+'_value_'+index" v-html="item" class="col-4" :class="item.includes('.') || item.includes('Empty')?'text-muted':'text-info'"></span>
         </div>
     </div>
 </template>
