@@ -10,13 +10,14 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body text-start">
+                    <p class="text-muted">Click on a command to see the description and how it works.</p>
                     <ul class="list-group">
-                        <li class="list-group-item" v-for="(command, commandName) in commands" :key="'valid_command_'+commandName">
-                            <h6 data-bs-toggle="collapse" :href="'#commands_help_collapse_'+commandName">> {{commandName}}</h6>
-                            <div class="collapse pb-2" :id="'commands_help_collapse_'+commandName">
-                                <span class="text-muted" v-html="command.description"></span>
+                        <li class="list-group-item p-2" v-for="(command, commandName) in commands" :key="'valid_command_'+commandName">
+                            <h6 data-bs-toggle="collapse" :href="'#commands_help_collapse_'+commandName" class="text-white bg-dark rounded p-1 mb-0">
+                                <b class="text-primary">~/</b>$ {{commandName}}</h6>
+                            <div class="collapse" :id="'commands_help_collapse_'+commandName">
+                                <span class="text-muted pb-2" v-html="command.description"></span>
                             </div>
-                    
                         </li>
                     </ul>
                 </div>

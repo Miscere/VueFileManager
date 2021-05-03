@@ -15,7 +15,7 @@
                     </div>
                     <div class="terminal-entry position-absolute bottom-0 left-0 pb-1 w-100">
                         <b class="text-primary">{{currentPath.text}}</b>$
-                        <input type="text" v-model="inputConsole" ref="DOMinputTerminal" class="terminal-input bg-dark text-white border-0 w-75">
+                        <input type="text" v-model="inputConsole" ref="DOMinputTerminal" class="terminal-input bg-dark text-white border-0 w-75" >
                     </div>
                 </div>
             </div>

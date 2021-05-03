@@ -15,7 +15,7 @@
                     </div>
                     <div class="terminal-entry position-absolute bottom-0 left-0 pb-1 w-100">
                         <b class="text-primary">{{currentPathText}}</b>$
-                        <input type="text" v-model="inputConsole" ref="DOMinputTerminal" class="terminal-input bg-dark text-white border-0 w-75">
+                        <input type="text" v-model="inputConsole" ref="DOMinputTerminal" class="terminal-input bg-dark text-white border-0 w-75" placeholder="Use the command 'help' to see all commands">
                     </div>
                 </div>
             </div>
@@ -27,32 +27,38 @@
                     Memory
                 </h4>
                 <div class="row">
-                    <div class="col border rounded m-1 pt-2">
+                    <div class="col border rounded m-1 pt-2 bg-white">
                         <h5>
                             <small class="text-muted">
                                 <i class="fa fa-battery-half">&nbsp;</i>
                                 Allocated
                             </small>
                         </h5>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" :style="`width:${((memory.blocks.length/32000)*100).toFixed(2)}%;`"></div>
+                        </div>
                         <h5>{{((memory.blocks.length/32000)*100).toFixed(2)}}<small class="text-muted">%</small></h5>
                         <h5>{{memory.blocks.length}}<small class="text-muted">&nbsp;blocks</small></h5>
                         <h5>{{memory.blocks.length*4/1000}}<small class="text-muted">&nbsp;Mb / 128 Mb</small></h5>
                     </div>
-                    <div class="col border rounded m-1 pt-2">
+                    <div class="col border rounded m-1 pt-2 bg-white">
                         <h5>
                             <small class="text-muted">
                                 <i class="fa fa-battery-empty">&nbsp;</i>
                                 Empty
                             </small>
                         </h5>
+                        <div class="progress">
+                            <div class="progress-bar bg-info" role="progressbar" :style="`width:${((memory.empties.length/memory.blocks.length)*100).toFixed(2)}%;`"></div>
+                        </div>
                         <h5>{{((memory.empties.length/memory.blocks.length)*100).toFixed(2)}}<small class="text-muted">%</small></h5>
                         <h5>{{memory.empties.length}}<small class="text-muted">&nbsp;blocks</small></h5>
                         <h5>{{memory.empties.length*4/1000}}<small class="text-muted">&nbsp;Mb / 128 Mb</small></h5>
                     </div>
                 </div>
                 <div class="row mb-5">
-                    <div class="col-12 col-md-6 col-lg-4 px-3 py-2" v-for="(block, index) in memory.nodes" :key="'block_'+index">
-                        <div class="row border rounded p-2">
+                    <div class="col-12 col-md-6 col-lg-4 px-3 py-2" v-for="(block, index) in memory.nodes.filter((v)=> {return v;})" :key="'block_'+index">
+                        <div class="row border rounded p-2 bg-white">
                             <div class="col-12">
                                 <h6>
                                     {{block.label}}
@@ -63,7 +69,7 @@
                                 <h6>{{((block.blocks.length/memory.blocks.length)*100).toFixed(2)}}<small class="text-muted">%</small></h6>
                             </div>
                             <div class="col-4">
-                                <h6>{{block.blocks.length}}<small class="text-muted">&nbsp;blocks</small></h6>
+                                <h6>{{block.blocks.length}}<small class="text-muted">&nbsp;block{{block.blocks.length>1?'s':''}}</small></h6>
                             </div>
                             <div class="col-4">
                                 <h6>{{block.blocks.length*4/1000}}<small class="text-muted">&nbsp;/128 Mb</small></h6>
@@ -89,53 +95,12 @@ export default {
       ModalHelp
     },
 
-    data() {
-
-
-//      Operações sobre arquivos:
-
-//     - Criar arquivo (touch)                                      OK
-//     - Remover arquivo (rm arquivo)                               OK
-//     - Escrever no arquivo (echo "conteudo legal" >> arquivo)     OK
-//     - Ler arquivo (cat arquivo)                                  OK
-//     - Copiar arquivo (cp arquivo1 arquivo2)                      OK 
-//     - Renomear arquivo (mv arquivo1 arquivo2)                    OK
-
-//      Operações sobre diretórios:
-
-//     - Criar diretório (mkdir diretorio)                                              OK
-//     - Remover diretório (rmdir diretorio) - só funciona se diretório estiver vazio   OK
-//     - Trocar de diretório (cd diretorio)                                             OK
-//         * Não esquecer dos arquivos especiais . e ..                                 OK
-//     - Renomear diretorio (mv diretorio1 diretorio2)                                  OK
-        
-        
+    data() {             
         return {
-            // 1kb por caracter
-            // 4kb por folder
             memory: {
-                // this.nodes
-                nodes: [
-                    // ~
-                    {id: 0,     type:'diretory',   label:'~',              parent: null,   children: [1,4],    blocks: [0]},
-                    // ~/home
-                    {id: 1,     type:'diretory',   label:'home',           parent: 0,      children: [2,3],    blocks: [1]},
-                    // ~/home/
-                    {id: 2,     type:'diretory',   label:'pictures',       parent: 1,      children: [],       blocks: [2]},
-                    {id: 3,     type:'diretory',   label:'documents',      parent: 1,      children: [7,8],    blocks: [3]},
-                    // ~/usr
-                    {id: 4,     type:'diretory',   label:'usr',            parent: 0,      children: [5,6],    blocks: [4]},
-                    // ~/usr/
-                    {id: 5,     type:'diretory',   label:'libs',           parent: 4,      children: [],       blocks: [5]},
-                    {id: 6,     type:'diretory',   label:'bin',            parent: 4,      children: [],       blocks: [6]},
-                    // ~/home/documents/
-                    {id: 7,     type:'file',        label:'README.TXT',     parent: 3,      content: 'Welcome to the terminal!',    blocks: [7,8,9,10,11,12]},
-                    {id: 8,     type:'file',        label:'helloWorld.txt', parent: 3,      content: '<b>Hello world!</b>',         blocks: [13,14,15,16,17]},
-                ],
-                // Memory blocks [node.id, node.id, ...]
-                blocks:         [0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8],
-                // Empty ids
-                empties:  []
+                nodes:      [],
+                blocks:     [],
+                empties:    []
             },
             
             currentNodeIndex: 0,
@@ -143,22 +108,23 @@ export default {
 
             blockColors: ["54478c","2c699a","048ba8","0db39e","16db93","83e377","b9e769","efea5a","f1c453","f29e4c"],
 
-            history: [
-                /*{ path: "~/", type: "unique", value:"ls teste" },
-                { path: "~/", type: "list",   value:["dir01", "dir02", "dir03"] },*/
-            ],
+            history: [],
 
             inputConsole: "",
             inputHistory: [],
             inputHistoryPosition: 0,
 
             validCommands: {
+                "help": {
+                    description:    "Show the help content into the terminal",
+                    function:       this.commandHelp
+                },
                 "echo": {
-                    description:    "Prints message"
+                    description:    "Write content into file"
                     + "<br>Input<br>"
-                    + "<i class='p-1 rounded bg-dark text-white'><b>echo</b> message</i><br>"
+                    + '<i class="p-1 rounded bg-dark text-white"><b>echo "</b> content <b>" >> file.txt</b> </i><br>'
                     + "Output<br>"
-                    + "<i class='p-1 rounded bg-dark text-white'>~/ message</i>",
+                    + "<i>Insert content into file <b>file.txt</b></i>",
                     function:       this.commandEcho
                 },
                 "clear":{
@@ -259,6 +225,14 @@ export default {
                     + "<i>Save current filesystem state</i>",
                     function:       this.commandSave
                 },
+                "reset":{
+                    description:    "Reset the saved state to default initial state"
+                    + "<br>Input<br>"
+                    + "<i class='p-1 rounded bg-dark text-white'><b>reset</b></i><br>"
+                    + "Output<br>"
+                    + "<i>Memory state and current state is reseted to default</i>",
+                    function:       this.commandReset
+                },
                 "load":{
                     description:    "Load last saved state"
                     + "<br>Input<br>"
@@ -289,6 +263,7 @@ export default {
             }
             
         });
+        this.commandLoad();
         this.updatePathText();
         this.$refs.DOMdivContainer.addEventListener('click', () => { this.$refs.DOMinputTerminal.focus() });
     },
@@ -350,6 +325,10 @@ export default {
             this.history.push({ path:this.currentPathText, type:'list', value:content });
         },
 
+        consolePrintHelp(content){
+            this.history.push({ path:this.currentPathText, type:'help', value:content });
+        },
+
         allocateBlocks(nodeId, blockQuantity){
             var blocks = [];
             while(blockQuantity--){
@@ -389,14 +368,42 @@ export default {
 
 
         // Console commands
+        commandHelp(){
+            var content = [];
+            for(var command of Object.keys(this.validCommands)){
+                content.push(command);
+                content.push(this.validCommands[command].description);
+            }
+            this.consolePrintHelp(content);
+        },
+
         commandSave(){
             var memoryJSON = JSON.stringify(this.memory)
             localStorage.setItem('memory', memoryJSON);
         },
 
+        commandReset(){
+            localStorage.setItem('memory', null);
+            this.commandLoad();
+        },
+
         commandLoad(){
-            var memoryJSON = localStorage.getItem('memory')
-            this.memory = (memoryJSON) ? JSON.parse(memoryJSON) : this.memory;
+            var memoryJSON = localStorage.getItem('memory');
+            // If found memory to load - load the last state
+            if(memoryJSON != 'null'){ this.memory = JSON.parse(memoryJSON); return; }
+            console.log('Creating default memory state...');
+            // Else create default memory state
+            this.memory = { nodes:[], blocks: [], empties: [] };
+            this.createDiretory('~',            null,   []);
+            this.createDiretory('home',         0,      []);
+            this.createDiretory('pictures',     1,      []);
+            this.createDiretory('documents',    1,      []);
+            this.createDiretory('usr',          0,      []);
+            this.createDiretory('libs',         4,      []);
+            this.createDiretory('bin',          4,      []);
+            this.createFile('README.txt',       3,      'Welcome to the terminal!');
+            this.createFile('helloWorld.txt',   3,      '<b>Hello world!</b>');
+            console.log(this.memory.nodes.map((v)=> {return v.label + '- ['+v.children+']';} ));
         },
 
         commandClear(){
@@ -437,7 +444,7 @@ export default {
             var path = args.pop() //a.txt
             args.pop()
             var content = args.join(" ")
-            content.replace('"','');
+            content.replace('"',null);
            
 
             var fileId = this.getPathIndex(path, parentId);
