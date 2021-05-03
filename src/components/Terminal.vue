@@ -390,7 +390,8 @@ export default {
         commandLoad(){
             var memoryJSON = localStorage.getItem('memory');
             // If found memory to load - load the last state
-            if(memoryJSON != 'null'){ this.memory = JSON.parse(memoryJSON); return; }
+            var memory = memoryJSON ? JSON.parse(memoryJSON) : null;
+            if(memory){ this.memory = JSON.parse(memoryJSON); return; }
             console.log('Creating default memory state...');
             // Else create default memory state
             this.memory = { nodes:[], blocks: [], empties: [] };
